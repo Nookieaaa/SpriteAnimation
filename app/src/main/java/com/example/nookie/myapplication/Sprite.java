@@ -3,6 +3,7 @@ package com.example.nookie.myapplication;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.util.Log;
 
 import java.util.Random;
 
@@ -23,6 +24,7 @@ public class Sprite {
     private int currentFrame = 0;
     private int width;
     private int height;
+    private boolean isCaptured = false;
 
     int[] DIRECTION_TO_ANIMATION_MAP = {3,1,0,2};
 
@@ -45,13 +47,14 @@ public class Sprite {
         if (x > gameView.getWidth() - width - xSpeed || x + xSpeed <= 0){
             xSpeed = -xSpeed;
         }
+        if (!isCaptured)
+            x+= xSpeed;
 
-        x+= xSpeed;
-
-        if(y > gameView.getHeight() - height - ySpeed || y+ySpeed <=0){
+        if (y > gameView.getHeight() - height - ySpeed || y+ySpeed <=0){
             ySpeed = -ySpeed;
         }
-        y+=ySpeed;
+        if (!isCaptured)
+            y+=ySpeed;
 
         currentFrame = ++currentFrame % BMP_COLS;
     }
@@ -89,8 +92,24 @@ public class Sprite {
         ySpeed = rnd.nextInt(10)-5;
     }
 
+    public void drag(GameView.MotionAction action) {
+        isCaptured = true;
+        move(action);
+    }
+
+    private void move(GameView.MotionAction action) {
+        x = action.getEndX();
+        y = action.getEndY();
+
+        Log.d("moving","moving to x="+x + ", y="+y);
+    }
+
+    public void endDrag(){
+        isCaptured = false;
+    }
+
     public boolean isCollision(float _x, float _y) {
-        boolean result = false;
+        boolean result;
 
         result = _x > x && _x<= x+width && _y > y && _y < y+width;
 
