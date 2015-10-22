@@ -33,6 +33,8 @@ public class GameView extends SurfaceView implements View.OnTouchListener {
 
     private Point size;
 
+    Sprite capturedSprite;
+
     MotionAction action;
 
 
@@ -130,7 +132,10 @@ public class GameView extends SurfaceView implements View.OnTouchListener {
             case MotionEvent.ACTION_MOVE:
                 int s2 = 2;
                 action.move(event.getX(), event.getY());
-                moveCharacter(action);
+                //moveCharacter(action);
+                if(capturedSprite!=null){
+                    capturedSprite.drag(action);
+                }
                 Log.d("drag", "x=" + String.valueOf(action.getEndX()) + " y=" + String.valueOf(action.getEndY()));
                 Log.d("drag2","x="+String.valueOf(event.getX())+ " y="+String.valueOf(event.getY()));
                 break;
@@ -138,9 +143,12 @@ public class GameView extends SurfaceView implements View.OnTouchListener {
                 int s3 = 3;
                 if (!action.isDragged())
                     deleteCharacter(event);
-                else
-                    Log.d("drag","released at x="+String.valueOf(action.getEndX())+", y="+String.valueOf(action.getEndY()));
-                    releaseCharacter(action);
+                else {
+                    Log.d("drag", "released at x=" + String.valueOf(action.getEndX()) + ", y=" + String.valueOf(action.getEndY()));
+                    //releaseCharacter(action);
+                    capturedSprite.endDrag();
+                }
+
                 break;
         }
 
@@ -215,6 +223,7 @@ public class GameView extends SurfaceView implements View.OnTouchListener {
                 Sprite sprite = sprites.get(i);
                 if (sprite.isCollision(action.getEndX(), action.getEndY())) {
                     sprite.drag(action);
+                    capturedSprite = sprite;
                     Log.d("drag3","locked");
                     break;
                 }
